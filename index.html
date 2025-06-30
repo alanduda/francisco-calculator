@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora do Francisco</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23e3e3e3'%3E%3Cpath d='M320-240h60v-80h80v-60h-80v-80h-60v80h-80v60h80v80Zm200-30h200v-60H520v60Zm0-100h200v-60H520v60Zm44-152 56-56 56 56 42-42-56-58 56-56-42-42-56 56-56-56-42 42 56 56-56 58 42 42Zm-314-70h200v-60H250v60Zm-50 472q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z'/%3E%3C/svg%3E" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3B82F6;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #3B82F6;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            background-color: #f2f5f9;
+            transition: background-color 0.4s ease-in-out;
+        }
+
+        html.dark body {
+            background-color: #12162a;
+        }
+
+        .dark .bg-white {
+            background-color: #22283b;
+        }
+
+        .bg-white {
+            box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+            transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+        }
+
+        .text-gray-800 {
+            color: #1a202c;
+        }
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .dark .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        .dark .text-gray-700 {
+            color: #cbd5e0;
+        }
+
+        .dark input[type="number"] {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+
+        .dark .focus\:ring-blue-400:focus {
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+        }
+
+        .dark .bg-blue-100 {
+            background-color: #2b6cb0;
+            border-color: #3182ce;
+            color: #e2e8f0;
+        }
+
+        .dark .text-blue-800 {
+            color: #e2e8f0;
+        }
+
+        .dark .text-blue-900 {
+            color: #e2e8f0;
+        }
+
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch-wrapper .switch {
+            position: relative;
+            margin-left: 0.5rem;
+        }
+
+        .switch__input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .switch__label {
+            display: block;
+            position: relative;
+            width: 100px;
+            height: 50px;
+            background-color: #BFDBFE;
+            border-radius: 25px;
+            transition: background-color 0.3s ease-in-out;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), inset 0 0 8px rgba(0,0,0,0.05);
+        }
+
+        html.dark .switch__label {
+            background-color: #1E40AF;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), inset 0 0 8px rgba(0,0,0,0.15);
+        }
+
+        .switch__label::before {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            border: 2px solid #2563EB;
+            background-color: #ffffff;
+            color: #2563EB;
+            transition: all 0.3s cubic-bezier(.64,.57,.67,1.53);
+            content: "\f185";
+            font-family: "Font Awesome 5 Free";
+            font-size: 30px;
+            font-weight: 900;
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        .switch__input:checked + .switch__label::before {
+            left: calc(100% - 50px);
+            border-color: #3B82F6;
+            background-color: #1f2937;
+            color: #3B82F6;
+            content: "\f186";
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .switch-sr {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        .input-error-message {
+            color: #EF4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .input-error-message.active {
+            display: block;
+        }
+        .input-error-border {
+            border-color: #EF4444 !important;
+        }
+
+        #resetBtn {
+            background-color: #3B82F6;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        #resetBtn:hover {
+            background-color: #2563EB;
+        }
+
+        html.dark #resetBtn {
+            background-color: #1C64F2;
+        }
+
+        html.dark #resetBtn:hover {
+            background-color: #1A56CE;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="theme-switch-wrapper">
+        <div class="switch">
+            <input id="themeSwitchInput" class="switch__input" name="switch" type="checkbox" role="switch" aria-label="Alternar tema">
+            <label class="switch__label" for="themeSwitchInput"></label>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora do Francisco</h1>
+
+        <div class="mb-4 flex flex-col">
+            <div class="flex items-center">
+                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                <label for="num1" class="sr-only">Valor 1:</label>
+                <input type="number" id="num1" value="0"
+                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+            </div>
+            <div id="num1Error" class="input-error-message">Por favor, insira um número válido.</div>
+        </div>
+
+        <div class="mb-4 flex flex-col">
+            <div class="flex items-center">
+                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                <label for="num2" class="sr-only">Valor 2:</label>
+                <input type="number" id="num2" value="0"
+                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+            </div>
+            <div id="num2Error" class="input-error-message">Por favor, insira um número válido.</div>
+        </div>
+
+        <div class="mb-6 flex flex-col">
+            <div class="flex items-center">
+                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                <label for="num3" class="sr-only">Valor 3:</label>
+                <input type="number" id="num3" value="0"
+                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+            </div>
+            <div id="num3Error" class="input-error-message">Por favor, insira um número válido.</div>
+        </div>
+
+        <div class="mb-6 flex flex-col">
+            <label for="discount" class="block text-gray-700 text-sm font-semibold mb-2">Desconto (%):</label>
+            <input type="number" id="discount" value="5" min="0" max="100"
+                   class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+            <div id="discountError" class="input-error-message">O desconto deve ser entre 0% e 100%.</div>
+        </div>
+
+        <div class="flex items-center justify-between mb-8">
+            <label for="toggleDiscount" class="text-gray-800 text-base font-semibold mr-4">Aplicar Desconto?</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggleDiscount">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg shadow-md mb-6" role="alert">
+            <p class="font-bold text-lg mb-1">Resultado Final:</p>
+            <p id="result" class="text-3xl font-extrabold text-blue-900">R$ 0.00</p>
+        </div>
+
+        <button id="resetBtn"
+                class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
+            Limpar
+        </button>
+    </div>
+
+    <script>
+        const num1Input = document.getElementById('num1');
+        const num2Input = document.getElementById('num2');
+        const num3Input = document.getElementById('num3');
+        const discountInput = document.getElementById('discount');
+        const toggleDiscount = document.getElementById('toggleDiscount');
+        const resultDisplay = document.getElementById('result');
+        const resetBtn = document.getElementById('resetBtn');
+        const themeSwitchInput = document.getElementById('themeSwitchInput');
+
+        const num1Error = document.getElementById('num1Error');
+        const num2Error = document.getElementById('num2Error');
+        const num3Error = document.getElementById('num3Error');
+        const discountError = document.getElementById('discountError');
+
+        let lastResultValue = 0;
+
+        function applyTheme(isDarkMode) {
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+            themeSwitchInput.checked = isDarkMode;
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            applyTheme(savedTheme === 'dark');
+        }
+
+        function animateResult(finalValue) {
+            const startValue = lastResultValue;
+            const duration = 300;
+            let startTime = null;
+
+            function step(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = (currentTime - startTime) / duration;
+
+                if (progress < 1) {
+                    const currentValue = startValue + (finalValue - startValue) * progress;
+                    resultDisplay.textContent = `R$ ${currentValue.toFixed(2)}`;
+                    requestAnimationFrame(step);
+                } else {
+                    resultDisplay.textContent = `R$ ${finalValue.toFixed(2)}`;
+                    lastResultValue = finalValue;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function validateNumberInput(inputElement, errorElement) {
+            const value = inputElement.value.trim();
+            const parsedValue = parseFloat(value);
+
+            if (value === '' || isNaN(parsedValue)) {
+                inputElement.classList.add('input-error-border');
+                errorElement.classList.add('active');
+                return 0;
+            } else {
+                inputElement.classList.remove('input-error-border');
+                errorElement.classList.remove('active');
+                return parsedValue;
+            }
+        }
+
+        function calculateTotal() {
+            const num1 = validateNumberInput(num1Input, num1Error);
+            const num2 = validateNumberInput(num2Input, num2Error);
+            const num3 = validateNumberInput(num3Input, num3Error);
+            let discount = validateNumberInput(discountInput, discountError);
+
+            if (discount < 0) {
+                discount = 0;
+                discountInput.value = 0;
+                discountError.textContent = "O desconto não pode ser negativo.";
+                discountError.classList.add('active');
+            } else if (discount > 100) {
+                discount = 100;
+                discountInput.value = 100;
+                discountError.textContent = "O desconto não pode ser maior que 100%.";
+                discountError.classList.add('active');
+            } else {
+                discountError.classList.remove('active');
+            }
+
+            let total = num1 + num2 + num3;
+
+            if (toggleDiscount.checked) {
+                const discountAmount = total * (discount / 100);
+                total -= discountAmount;
+            }
+
+            animateResult(total);
+        }
+
+        function resetCalculator() {
+            num1Input.value = 0;
+            num2Input.value = 0;
+            num3Input.value = 0;
+            discountInput.value = 5;
+            toggleDiscount.checked = false;
+
+            num1Error.classList.remove('active');
+            num2Error.classList.remove('active');
+            num3Error.classList.remove('active');
+            discountError.classList.remove('active');
+            num1Input.classList.remove('input-error-border');
+            num2Input.classList.remove('input-error-border');
+            num3Input.classList.remove('input-error-border');
+            discountInput.classList.remove('input-error-border');
+
+            calculateTotal();
+        }
+
+        [num1Input, num2Input, num3Input, discountInput].forEach(input => {
+            input.addEventListener('input', calculateTotal);
+        });
+        toggleDiscount.addEventListener('change', calculateTotal);
+
+        resetBtn.addEventListener('click', resetCalculator);
+
+        themeSwitchInput.addEventListener('change', () => {
+            applyTheme(themeSwitchInput.checked);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            calculateTotal();
+        });
+    </script>
+</body>
+</html>
