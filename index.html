@@ -3,257 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora do Francisco</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23e3e3e3'%3E%3Cpath d='M320-240h60v-80h80v-60h-80v-80h-60v80h-80v60h80v80Zm200-30h200v-60H520v60Zm0-100h200v-60H520v60Zm44-152 56-56 56 56 42-42-56-58 56-56-42-42-56 56-56-56-42 42 56 56-56 58 42 42Zm-314-70h200v-60H250v60Zm-50 472q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z'/%3E%3C/svg%3E" type="image/svg+xml">
+    <title>Calculadora Inteligente</title>
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
+        #splash-screen {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 34px;
+            width: 100vw;
+            height: 100vh;
+            background-color: #12162a;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+            visibility: visible;
+            opacity: 1;
         }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
-
-        input:checked + .slider {
+        .loading-dots {
+            display: flex;
+            gap: 10px;
+            margin-top: 2rem;
+        }
+        .loading-dots .dot {
+            width: 12px;
+            height: 12px;
             background-color: #3B82F6;
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #3B82F6;
-        }
-
-        input:checked + .slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-        }
-
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
             border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            position: relative;
             background-color: #f2f5f9;
             transition: background-color 0.4s ease-in-out;
+            overflow-x: auto;
+            padding-bottom: 4rem;
         }
-
         html.dark body {
             background-color: #12162a;
         }
-
-        .dark .bg-white {
+        .card {
+            background-color: #ffffff;
+            transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out, opacity 0.4s ease;
+            box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+        }
+        .dark .card {
             background-color: #22283b;
         }
-
-        .bg-white {
-            box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
-            transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+        .card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
-
-        .text-gray-800 {
-            color: #1a202c;
-        }
-        .text-gray-700 {
-            color: #374151;
-        }
-
-        .dark .text-gray-800 {
-            color: #e2e8f0;
-        }
-
-        .dark .text-gray-700 {
-            color: #cbd5e0;
-        }
-
+        .dark .text-gray-800 { color: #e2e8f0; }
+        .dark .text-gray-700 { color: #cbd5e0; }
+        .dark .text-gray-600 { color: #a0aec0; }
         .dark input[type="number"] {
             background-color: #4a5568;
             color: #e2e8f0;
             border-color: #4a5568;
         }
-
         .dark .focus\:ring-blue-400:focus {
             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
         }
-
         .dark .bg-blue-100 {
             background-color: #2b6cb0;
             border-color: #3182ce;
             color: #e2e8f0;
         }
-
-        .dark .text-blue-800 {
+        .dark .bg-green-100 {
+            background-color: #2f855a;
+            border-color: #38a169;
             color: #e2e8f0;
         }
-
-        .dark .text-blue-900 {
-            color: #e2e8f0;
-        }
+        .dark .text-blue-800, .dark .text-green-800 { color: #e2e8f0; }
+        .dark .text-blue-900, .dark .text-green-900 { color: #e2e8f0; }
 
         .theme-switch-wrapper {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 1.5rem;
+            right: 1.5rem;
             z-index: 10;
             display: flex;
             align-items: center;
         }
-
-        .theme-switch-wrapper .switch {
-            position: relative;
-            margin-left: 0.5rem;
-        }
-
+        .switch { position: relative; }
         .switch__input {
-            position: absolute;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            opacity: 0;
-            z-index: 1;
-            cursor: pointer;
+            position: absolute; top: 0; right: 0; left: 0; bottom: 0;
+            width: 100%; height: 100%; margin: 0; opacity: 0; z-index: 1; cursor: pointer;
         }
-
         .switch__label {
-            display: block;
-            position: relative;
-            width: 100px;
-            height: 50px;
-            background-color: #BFDBFE;
-            border-radius: 25px;
+            display: block; position: relative; width: 100px; height: 50px;
+            background-color: #BFDBFE; border-radius: 25px;
             transition: background-color 0.3s ease-in-out;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), inset 0 0 8px rgba(0,0,0,0.05);
         }
-
         html.dark .switch__label {
             background-color: #1E40AF;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), inset 0 0 8px rgba(0,0,0,0.15);
         }
-
         .switch__label::before {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 50px;
-            height: 50px;
-            border-radius: 100%;
-            border: 2px solid #2563EB;
-            background-color: #ffffff;
-            color: #2563EB;
+            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 0; left: 0; bottom: 0;
+            width: 50px; height: 50px; border-radius: 100%;
+            border: 2px solid #2563EB; background-color: #ffffff; color: #2563EB;
             transition: all 0.3s cubic-bezier(.64,.57,.67,1.53);
-            content: "\f185";
-            font-family: "Font Awesome 5 Free";
-            font-size: 30px;
-            font-weight: 900;
-            box-sizing: border-box;
+            content: "\f185"; font-family: "Font Awesome 5 Free";
+            font-size: 30px; font-weight: 900; box-sizing: border-box;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px rgba(0,0,0,0.05);
         }
-
         .switch__input:checked + .switch__label::before {
-            left: calc(100% - 50px);
-            border-color: #3B82F6;
-            background-color: #1f2937;
-            color: #3B82F6;
+            left: calc(100% - 50px); border-color: #3B82F6;
+            background-color: #1f2937; color: #3B82F6;
             content: "\f186";
             box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.1);
         }
 
-        .switch-sr {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 26px; width: 26px;
+            left: 4px; bottom: 4px; background-color: white;
+            transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #3B82F6; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .input-error-message { color: #EF4444; font-size: 0.75rem; margin-top: 0.25rem; display: none; }
+        .input-error-message.active { display: block; }
+        .input-error-border { border-color: #EF4444 !important; }
+        #discountIndicator {
+            opacity: 0;
+            height: 0;
+            margin-bottom: 0;
             overflow: hidden;
-            clip: rect(0, 0, 0, 0);
+            transition: opacity 0.3s ease, height 0.3s ease, margin-bottom 0.3s ease;
+        }
+        #discountIndicator.active {
+            opacity: 1;
+            height: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .change-detail-item {
+            display: flex; justify-content: space-between; padding: 0.25rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .dark .change-detail-item { border-bottom: 1px dashed #4a5568; }
+
+        .calculator-preview {
+            text-align: right;
+            color: #9ca3af;
+            font-size: 1rem;
+            height: 1.5rem;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
             white-space: nowrap;
-            border-width: 0;
+            transition: color 0.4s ease-in-out;
+        }
+        html.dark .calculator-preview {
+            color: #6b7280;
+        }
+        .calculator-display {
+            background-color: #e2e8f0; color: #1a202c; font-size: 2rem;
+            padding: 0.75rem; border-radius: 0.5rem; text-align: right;
+            margin-bottom: 1rem; min-height: 3.5rem; display: flex;
+            align-items: center; justify-content: flex-end; overflow: hidden;
+            white-space: nowrap; font-weight: 600;
+        }
+        html.dark .calculator-display { background-color: #4a5568; color: #e2e8f0; }
+        .calculator-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+        .calculator-button {
+            background-color: #cbd5e0; color: #2d3748; padding: 1rem;
+            border-radius: 0.5rem; font-size: 1.25rem; font-weight: 600;
+            cursor: pointer; transition: background-color 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center; user-select: none;
+            height: 60px;
+        }
+        .calculator-button:hover { background-color: #a0aec0; transform: scale(1.02); }
+        .calculator-button:active { transform: scale(0.98); }
+        .calculator-button.operator { background-color: #6366f1; color: #ffffff; }
+        .calculator-button.operator:hover { background-color: #4f46e5; }
+        .calculator-button.equals { background-color: #10b981; color: #ffffff; }
+        .calculator-button.equals:hover { background-color: #059669; }
+        .calculator-button.clear { background-color: #ef4444; color: #ffffff; }
+        .calculator-button.clear:hover { background-color: #dc2626; }
+        html.dark .calculator-button { background-color: #4a5568; color: #e2e8f0; }
+        html.dark .calculator-button:hover { background-color: #6366f1; }
+        html.dark .calculator-button.operator { background-color: #4f46e5; }
+        html.dark .calculator-button.operator:hover { background-color: #3730a3; }
+        html.dark .calculator-button.equals { background-color: #059669; }
+        html.dark .calculator-button.equals:hover { background-color: #047857; }
+        html.dark .calculator-button.clear { background-color: #dc2626; }
+        html.dark .calculator-button.clear:hover { background-color: #b91c1c; }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 6rem 1.5rem 1.5rem;
+            min-height: 100vh;
+            width: fit-content;
+            min-width: 100%;
         }
 
-        .input-error-message {
-            color: #EF4444;
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-            display: none;
+        footer {
+            text-align: center;
+            padding: 0.75rem;
+            color: #6b7280;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: #f2f5f9;
+            border-top: 1px solid #e5e7eb;
+            z-index: 100;
+            transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
         }
-        .input-error-message.active {
-            display: block;
-        }
-        .input-error-border {
-            border-color: #EF4444 !important;
-        }
-
-        #resetBtn {
-            background-color: #3B82F6;
-            transition: background-color 0.3s ease-in-out;
-        }
-
-        #resetBtn:hover {
-            background-color: #2563EB;
-        }
-
-        html.dark #resetBtn {
-            background-color: #1C64F2;
-        }
-
-        html.dark #resetBtn:hover {
-            background-color: #1A56CE;
+        html.dark footer {
+            background-color: #12162a;
+            border-top: 1px solid #2d3748;
+            color: #9ca3af;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
+
+    <div id="splash-screen">
+        <img src="logo.svg" alt="Logo" class="w-24 h-24">
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
 
     <div class="theme-switch-wrapper">
         <div class="switch">
@@ -262,195 +266,436 @@
         </div>
     </div>
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-1/2">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora do Francisco</h1>
+    <div class="main-container">
 
-        <div class="mb-4 flex flex-col">
-            <div class="flex items-center">
-                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
-                <label for="num1" class="sr-only">Valor 1:</label>
-                <input type="number" id="num1" value="0"
-                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+        <div class="card p-8 rounded-2xl shadow-xl w-full max-w-md flex flex-col flex-shrink-0">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora rápida</h2>
+            <div id="miniCalcPreview" class="calculator-preview"></div>
+            <div id="miniCalcDisplay" class="calculator-display">0</div>
+            <div class="calculator-grid">
+                <button class="calculator-button clear" data-action="clear" style="grid-column: span 2;">C</button>
+                <button class="calculator-button" data-action="backspace">⌫</button>
+                <button class="calculator-button operator" data-operator="/">÷</button>
+                
+                <button class="calculator-button" data-value="7">7</button>
+                <button class="calculator-button" data-value="8">8</button>
+                <button class="calculator-button" data-value="9">9</button>
+                <button class="calculator-button operator" data-operator="*">×</button>
+                
+                <button class="calculator-button" data-value="4">4</button>
+                <button class="calculator-button" data-value="5">5</button>
+                <button class="calculator-button" data-value="6">6</button>
+                <button class="calculator-button operator" data-operator="-">-</button>
+                
+                <button class="calculator-button" data-value="1">1</button>
+                <button class="calculator-button" data-value="2">2</button>
+                <button class="calculator-button" data-value="3">3</button>
+                <button class="calculator-button operator" data-operator="+">+</button>
+                
+                <button class="calculator-button" data-value="0" style="grid-column: span 2;">0</button>
+                <button class="calculator-button" data-value=".">.</button>
+                <button class="calculator-button equals" data-operator="=">=</button>
             </div>
-            <div id="num1Error" class="input-error-message">Por favor, insira um número válido.</div>
         </div>
 
-        <div class="mb-4 flex flex-col">
-            <div class="flex items-center">
-                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
-                <label for="num2" class="sr-only">Valor 2:</label>
-                <input type="number" id="num2" value="0"
-                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+        <div class="card p-8 rounded-2xl shadow-xl w-full max-w-md flex-shrink-0">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora principal</h1>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <div class="flex items-center">
+                        <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                        <input type="number" id="num1" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    </div>
+                    <div id="num1Error" class="input-error-message"></div>
+                </div>
+                <div>
+                    <div class="flex items-center">
+                        <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                        <input type="number" id="num2" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    </div>
+                    <div id="num2Error" class="input-error-message"></div>
+                </div>
+                <div>
+                    <div class="flex items-center">
+                        <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                        <input type="number" id="num3" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    </div>
+                    <div id="num3Error" class="input-error-message"></div>
+                </div>
+                <div>
+                    <div class="flex items-center">
+                        <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                        <input type="number" id="num4" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    </div>
+                    <div id="num4Error" class="input-error-message"></div>
+                </div>
+                <div>
+                    <div class="flex items-center">
+                        <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                        <input type="number" id="num5" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    </div>
+                    <div id="num5Error" class="input-error-message"></div>
+                </div>
             </div>
-            <div id="num2Error" class="input-error-message">Por favor, insira um número válido.</div>
-        </div>
 
-        <div class="mb-6 flex flex-col">
-            <div class="flex items-center">
-                <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
-                <label for="num3" class="sr-only">Valor 3:</label>
-                <input type="number" id="num3" value="0"
-                       class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
+            <div class="mb-4">
+                <label for="discount" class="block text-gray-700 text-sm font-semibold mb-2">Desconto (%):</label>
+                <input type="number" id="discount" value="5" min="0" max="100" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                <div id="discountError" class="input-error-message">O desconto deve ser entre 0% e 100%.</div>
             </div>
-            <div id="num3Error" class="input-error-message">Por favor, insira um número válido.</div>
+            <div class="flex items-center justify-between mb-6">
+                <label for="toggleDiscount" class="text-gray-800 text-base font-semibold">Aplicar desconto?</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggleDiscount">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg shadow-md mb-4" role="alert">
+                <p class="font-bold text-lg mb-1">Total a pagar:</p>
+                <p id="result" class="text-3xl font-extrabold text-blue-900">R$ 0,00</p>
+            </div>
+            <div id="discountIndicator" class="text-sm text-green-500 font-bold text-center">DESCONTO APLICADO!</div>
+
+            <div class="flex items-center justify-between mb-4">
+                <label for="toggleChange" class="text-gray-800 text-base font-semibold">Habilitar troco?</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggleChange">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <button id="resetBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition">Limpar</button>
         </div>
 
-        <div class="mb-6 flex flex-col">
-            <label for="discount" class="block text-gray-700 text-sm font-semibold mb-2">Desconto (%):</label>
-            <input type="number" id="discount" value="5" min="0" max="100"
-                   class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out">
-            <div id="discountError" class="input-error-message">O desconto deve ser entre 0% e 100%.</div>
-        </div>
+        <div id="changeCard" class="card p-8 rounded-2xl shadow-xl w-full max-w-md flex-shrink-0">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora de troco</h2>
+            
+            <div class="mb-4">
+                <label for="amountPaid" class="block text-gray-700 text-sm font-semibold mb-2">Valor pago:</label>
+                <div class="flex items-center">
+                    <span class="text-gray-700 text-lg font-semibold mr-2">R$</span>
+                    <input type="number" id="amountPaid" value="0" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                </div>
+                <div id="amountPaidError" class="input-error-message"></div>
+            </div>
 
-        <div class="flex items-center justify-between mb-8">
-            <label for="toggleDiscount" class="text-gray-800 text-base font-semibold mr-4">Aplicar Desconto?</label>
-            <label class="toggle-switch">
-                <input type="checkbox" id="toggleDiscount">
-                <span class="slider round"></span>
-            </label>
-        </div>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-lg shadow-md mb-6" role="alert">
+                <p class="font-bold text-lg mb-1">Troco a voltar:</p>
+                <p id="changeResult" class="text-3xl font-extrabold text-green-900">R$ 0,00</p>
+            </div>
 
-        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg shadow-md mb-6" role="alert">
-            <p class="font-bold text-lg mb-1">Resultado Final:</p>
-            <p id="result" class="text-3xl font-extrabold text-blue-900">R$ 0.00</p>
+            <div id="changeDetails" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 p-4 rounded-lg shadow-inner">
+                <p class="font-bold text-lg mb-2">Detalhes do troco:</p>
+                <div id="changeDetailsList"></div>
+            </div>
         </div>
-
-        <button id="resetBtn"
-                class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
-            Limpar
-        </button>
     </div>
 
+    <footer>
+        <div class="flex justify-center items-center gap-2">
+            <img src="logo.svg" alt="Logo" class="w-5 h-5">
+            <span>Developed by <a href="https://github.com/alanduda" target="_blank" rel="noopener noreferrer" class="underline hover:text-blue-500 transition-colors">Alan Duda</a></span>
+        </div>
+    </footer>
+
     <script>
-        const num1Input = document.getElementById('num1');
-        const num2Input = document.getElementById('num2');
-        const num3Input = document.getElementById('num3');
-        const discountInput = document.getElementById('discount');
-        const toggleDiscount = document.getElementById('toggleDiscount');
-        const resultDisplay = document.getElementById('result');
-        const resetBtn = document.getElementById('resetBtn');
-        const themeSwitchInput = document.getElementById('themeSwitchInput');
-
-        const num1Error = document.getElementById('num1Error');
-        const num2Error = document.getElementById('num2Error');
-        const num3Error = document.getElementById('num3Error');
-        const discountError = document.getElementById('discountError');
-
-        let lastResultValue = 0;
-
-        function applyTheme(isDarkMode) {
-            if (isDarkMode) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
-            themeSwitchInput.checked = isDarkMode;
-        }
-
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            applyTheme(savedTheme === 'dark');
-        }
-
-        function animateResult(finalValue) {
-            const startValue = lastResultValue;
-            const duration = 300;
-            let startTime = null;
-
-            function step(currentTime) {
-                if (!startTime) startTime = currentTime;
-                const progress = (currentTime - startTime) / duration;
-
-                if (progress < 1) {
-                    const currentValue = startValue + (finalValue - startValue) * progress;
-                    resultDisplay.textContent = `R$ ${currentValue.toFixed(2)}`;
-                    requestAnimationFrame(step);
-                } else {
-                    resultDisplay.textContent = `R$ ${finalValue.toFixed(2)}`;
-                    lastResultValue = finalValue;
-                }
-            }
-            requestAnimationFrame(step);
-        }
-
-        function validateNumberInput(inputElement, errorElement) {
-            const value = inputElement.value.trim();
-            const parsedValue = parseFloat(value);
-
-            if (value === '' || isNaN(parsedValue)) {
-                inputElement.classList.add('input-error-border');
-                errorElement.classList.add('active');
-                return 0;
-            } else {
-                inputElement.classList.remove('input-error-border');
-                errorElement.classList.remove('active');
-                return parsedValue;
-            }
-        }
-
-        function calculateTotal() {
-            const num1 = validateNumberInput(num1Input, num1Error);
-            const num2 = validateNumberInput(num2Input, num2Error);
-            const num3 = validateNumberInput(num3Input, num3Error);
-            let discount = validateNumberInput(discountInput, discountError);
-
-            if (discount < 0) {
-                discount = 0;
-                discountInput.value = 0;
-                discountError.textContent = "O desconto não pode ser negativo.";
-                discountError.classList.add('active');
-            } else if (discount > 100) {
-                discount = 100;
-                discountInput.value = 100;
-                discountError.textContent = "O desconto não pode ser maior que 100%.";
-                discountError.classList.add('active');
-            } else {
-                discountError.classList.remove('active');
-            }
-
-            let total = num1 + num2 + num3;
-
-            if (toggleDiscount.checked) {
-                const discountAmount = total * (discount / 100);
-                total -= discountAmount;
-            }
-
-            animateResult(total);
-        }
-
-        function resetCalculator() {
-            num1Input.value = 0;
-            num2Input.value = 0;
-            num3Input.value = 0;
-            discountInput.value = 5;
-            toggleDiscount.checked = false;
-
-            num1Error.classList.remove('active');
-            num2Error.classList.remove('active');
-            num3Error.classList.remove('active');
-            discountError.classList.remove('active');
-            num1Input.classList.remove('input-error-border');
-            num2Input.classList.remove('input-error-border');
-            num3Input.classList.remove('input-error-border');
-            discountInput.classList.remove('input-error-border');
-
-            calculateTotal();
-        }
-
-        [num1Input, num2Input, num3Input, discountInput].forEach(input => {
-            input.addEventListener('input', calculateTotal);
-        });
-        toggleDiscount.addEventListener('change', calculateTotal);
-
-        resetBtn.addEventListener('click', resetCalculator);
-
-        themeSwitchInput.addEventListener('change', () => {
-            applyTheme(themeSwitchInput.checked);
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            setTimeout(() => {
+                splashScreen.classList.add('hidden');
+            }, 1000);
+
+            const themeSwitchInput = document.getElementById('themeSwitchInput');
+            const inputs = [
+                document.getElementById('num1'), document.getElementById('num2'),
+                document.getElementById('num3'), document.getElementById('num4'), document.getElementById('num5')
+            ];
+            const errorDivs = [
+                document.getElementById('num1Error'), document.getElementById('num2Error'),
+                document.getElementById('num3Error'), document.getElementById('num4Error'), document.getElementById('num5Error')
+            ];
+            const discountInput = document.getElementById('discount');
+            const discountError = document.getElementById('discountError');
+            const toggleDiscount = document.getElementById('toggleDiscount');
+            const resultDisplay = document.getElementById('result');
+            const discountIndicator = document.getElementById('discountIndicator');
+            const resetBtn = document.getElementById('resetBtn');
+            const toggleChange = document.getElementById('toggleChange');
+            const changeCard = document.getElementById('changeCard');
+            const amountPaidInput = document.getElementById('amountPaid');
+            const amountPaidError = document.getElementById('amountPaidError');
+            const changeResultDisplay = document.getElementById('changeResult');
+            const changeDetailsDiv = document.getElementById('changeDetails');
+            const changeDetailsList = document.getElementById('changeDetailsList');
+            const miniCalcDisplay = document.getElementById('miniCalcDisplay');
+            const miniCalcPreview = document.getElementById('miniCalcPreview');
+            const miniCalcButtons = document.querySelectorAll('.card:first-child .calculator-button');
+
+            let totalValue = 0;
+            let lastTotalValue = 0;
+            let lastChangeValue = 0;
+            let isRounded = false;
+            const denominations = [
+                { value: 100, name: 'cédula de R$100', plural: 'cédulas de R$100' },
+                { value: 50, name: 'cédula de R$50', plural: 'cédulas de R$50' },
+                { value: 20, name: 'cédula de R$20', plural: 'cédulas de R$20' },
+                { value: 10, name: 'cédula de R$10', plural: 'cédulas de R$10' },
+                { value: 5, name: 'cédula de R$5', plural: 'cédulas de R$5' },
+                { value: 2, name: 'cédula de R$2', plural: 'cédulas de R$2' },
+                { value: 1, name: 'moeda de R$1', plural: 'moedas de R$1' },
+                { value: 0.50, name: 'moeda de R$0,50', plural: 'moedas de R$0,50' },
+                { value: 0.25, name: 'moeda de R$0,25', plural: 'moedas de R$0,25' },
+                { value: 0.10, name: 'moeda de R$0,10', plural: 'moedas de R$0,10' },
+                { value: 0.05, name: 'moeda de R$0,05', plural: 'moedas de R$0,05' },
+                { value: 0.01, name: 'moeda de R$0,01', plural: 'moedas de R$0,01' }
+            ];
+
+            const applyTheme = (isDarkMode) => {
+                document.documentElement.classList.toggle('dark', isDarkMode);
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                themeSwitchInput.checked = isDarkMode;
+            };
+            const loadTheme = () => applyTheme(localStorage.getItem('theme') === 'dark');
+
+            const formatCurrency = (value) => `R$ ${value.toFixed(2).replace('.', ',')}`;
+
+            const animateValue = (element, start, end, duration) => {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const currentValue = progress * (end - start) + start;
+                    element.textContent = formatCurrency(currentValue);
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            const validateInput = (input, errorDiv, message = "Insira um número válido.") => {
+                const valueStr = input.value.trim().replace(',', '.');
+                const value = parseFloat(valueStr);
+                const isValid = !isNaN(value) && valueStr !== '';
+                input.classList.toggle('input-error-border', !isValid);
+                errorDiv.classList.toggle('active', !isValid);
+                errorDiv.textContent = isValid ? '' : message;
+                return isValid ? value : 0;
+            };
+
+            const calculateTotal = () => {
+                let sum = inputs.reduce((acc, input, i) => acc + validateInput(input, errorDivs[i]), 0);
+                let discount = validateInput(discountInput, discountError, "Desconto inválido.");
+
+                if (discount < 0 || discount > 100) {
+                    discountInput.classList.add('input-error-border');
+                    discountError.classList.add('active');
+                    discountError.textContent = "O desconto deve ser entre 0 e 100%.";
+                    discount = Math.max(0, Math.min(100, discount));
+                }
+
+                totalValue = sum;
+                discountIndicator.classList.remove('active');
+                if (toggleDiscount.checked) {
+                    const discountAmount = totalValue * (discount / 100);
+                    totalValue -= discountAmount;
+                    if (discount > 0) {
+                        discountIndicator.classList.add('active');
+                    }
+                }
+                
+                animateValue(resultDisplay, lastTotalValue, totalValue, 300);
+                lastTotalValue = totalValue;
+
+                if (!changeCard.classList.contains('disabled')) {
+                    calculateChange();
+                }
+            };
+            
+            const calculateChange = () => {
+                const amountPaid = validateInput(amountPaidInput, amountPaidError, "Valor pago inválido.");
+                const change = amountPaid - totalValue;
+                const finalChange = change < 0 ? 0 : change;
+
+                amountPaidError.classList.toggle('active', amountPaid < totalValue);
+                amountPaidInput.classList.toggle('input-error-border', amountPaid < totalValue);
+                amountPaidError.textContent = amountPaid < totalValue ? "Valor pago insuficiente." : "";
+
+                animateValue(changeResultDisplay, lastChangeValue, finalChange, 300);
+                lastChangeValue = finalChange;
+                updateChangeDetails(change);
+            };
+
+            const updateChangeDetails = (change) => {
+                changeDetailsList.innerHTML = '';
+                if (change < 0.01) {
+                    changeDetailsList.innerHTML = '<div class="change-detail-item"><span>Nenhum troco necessário.</span></div>';
+                    return;
+                }
+                
+                let remainingChange = change;
+                denominations.forEach(denom => {
+                    const count = Math.floor(remainingChange / denom.value + 0.00001);
+                    if (count > 0) {
+                        const detailItem = document.createElement('div');
+                        detailItem.className = 'change-detail-item';
+                        detailItem.innerHTML = `<span>${count} ${count === 1 ? denom.name : denom.plural}</span><span>${formatCurrency(count * denom.value)}</span>`;
+                        changeDetailsList.appendChild(detailItem);
+                        remainingChange -= count * denom.value;
+                    }
+                });
+            };
+
+            const handleToggleChange = () => {
+                changeCard.classList.toggle('disabled', !toggleChange.checked);
+                if (!toggleChange.checked) {
+                    amountPaidInput.value = '0';
+                    changeResultDisplay.textContent = formatCurrency(0);
+                    lastChangeValue = 0;
+                    changeDetailsList.innerHTML = '';
+                    amountPaidError.classList.remove('active');
+                    amountPaidInput.classList.remove('input-error-border');
+                } else {
+                    calculateChange();
+                }
+            };
+            
+            let currentInput = '0', previousInput = '', operation = null, resetDisplay = false;
+
+            const updateMiniPreview = () => {
+                if (operation && previousInput) {
+                    const operatorSymbol = { '*': '×', '/': '÷', '+': '+', '-': '-' }[operation];
+                    if (resetDisplay) {
+                        miniCalcPreview.textContent = `${previousInput.replace('.',',')} ${operatorSymbol}`;
+                    } else {
+                        miniCalcPreview.textContent = `${previousInput.replace('.',',')} ${operatorSymbol} ${currentInput.replace('.',',')}`;
+                    }
+                } else {
+                    miniCalcPreview.textContent = '';
+                }
+            };
+            const updateMiniDisplay = () => {
+                let displayValue = currentInput.replace('.', ',');
+                if (isRounded) {
+                    miniCalcDisplay.textContent = `~${displayValue}`;
+                } else {
+                    miniCalcDisplay.textContent = displayValue;
+                }
+            };
+            const clearMiniCalc = () => {
+                currentInput = '0';
+                previousInput = '';
+                operation = null;
+                resetDisplay = false;
+                isRounded = false;
+                updateMiniDisplay();
+                updateMiniPreview();
+            };
+            const backspaceMiniCalc = () => {
+                currentInput = currentInput.slice(0, -1) || '0';
+                isRounded = false;
+                updateMiniDisplay();
+                updateMiniPreview();
+            }
+            const appendNumber = (number) => {
+                if (resetDisplay) {
+                    currentInput = number;
+                    resetDisplay = false;
+                    isRounded = false;
+                }
+                else if (currentInput === '0' && number !== '.') {
+                    currentInput = number;
+                }
+                else if (number === '.' && currentInput.includes('.')) {
+                    return;
+                }
+                else {
+                    currentInput += number;
+                }
+                updateMiniDisplay();
+                updateMiniPreview();
+            };
+            const handleOperation = (op) => {
+                if (currentInput === '' || currentInput === 'Erro') return;
+                if (previousInput !== '' && operation && !resetDisplay) {
+                    calculateMiniResult();
+                    previousInput = currentInput; // Chain calculation
+                } else {
+                    previousInput = currentInput;
+                }
+                operation = op;
+                resetDisplay = true;
+                updateMiniPreview();
+            };
+            const calculateMiniResult = () => {
+                let result;
+                const prev = parseFloat(previousInput);
+                const current = parseFloat(currentInput);
+                if (isNaN(prev) || isNaN(current) || !operation) return;
+                
+                switch (operation) {
+                    case '+': result = prev + current; break;
+                    case '-': result = prev - current; break;
+                    case '*': result = prev * current; break;
+                    case '/': result = current === 0 ? 'Erro' : prev / current; break;
+                    default: return;
+                }
+
+                if (result !== 'Erro' && !Number.isInteger(result)) {
+                    const resultStr = String(result);
+                    if (resultStr.includes('.') && resultStr.split('.')[1].length > 2) {
+                        result = parseFloat(result.toFixed(2));
+                        isRounded = true;
+                    } else {
+                        isRounded = false;
+                    }
+                } else {
+                    isRounded = false;
+                }
+
+                currentInput = String(result);
+                operation = null;
+                previousInput = '';
+                resetDisplay = true;
+                updateMiniDisplay();
+                updateMiniPreview();
+            };
+
+            themeSwitchInput.addEventListener('change', () => applyTheme(themeSwitchInput.checked));
+            
+            [...inputs, discountInput, amountPaidInput].forEach(input => input.addEventListener('input', calculateTotal));
+            toggleDiscount.addEventListener('change', calculateTotal);
+            toggleChange.addEventListener('change', handleToggleChange);
+            
+            resetBtn.addEventListener('click', () => {
+                inputs.forEach(input => {
+                    input.value = '0';
+                    input.classList.remove('input-error-border');
+                });
+                errorDivs.forEach(div => div.classList.remove('active'));
+                discountInput.value = '5';
+                amountPaidInput.value = '0';
+                discountInput.classList.remove('input-error-border');
+                discountError.classList.remove('active');
+                amountPaidInput.classList.remove('input-error-border');
+                amountPaidError.classList.remove('active');
+                calculateTotal();
+            });
+
+            miniCalcButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const { value, operator, action } = button.dataset;
+                    if (value) appendNumber(value);
+                    else if (operator === '=') calculateMiniResult();
+                    else if (operator) handleOperation(operator);
+                    else if (action === 'clear') clearMiniCalc();
+                    else if (action === 'backspace') backspaceMiniCalc();
+                });
+            });
+
+            handleToggleChange();
             loadTheme();
             calculateTotal();
         });
