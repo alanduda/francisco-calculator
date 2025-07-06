@@ -1,1 +1,1 @@
-# francisco-calculator
+# Smart Calculator
